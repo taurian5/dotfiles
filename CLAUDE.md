@@ -53,6 +53,32 @@ cp .claude/settings.local.json ~/.claude/settings.json
 
 ## Development Conventions
 
+### Code Style
+
+**Avoid these fragile antipatterns without explicit approval:**
+
+- **No `..` path traversals**: Instead, resolve the parent directory explicitly:
+  - PowerShell: `$repoRoot = Split-Path $PSScriptRoot -Parent`
+  - Bash: `REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"`
+
+- **No hardcoded absolute paths**: Use script-relative or environment-based paths:
+  - Bad: `C:\Users\Will\Documents\project\file.txt`
+  - Good: `Join-Path $PSScriptRoot "file.txt"` or `"$SCRIPT_DIR/file.txt"`
+
+- **No unchecked external commands**: Always verify commands exist before using:
+  - PowerShell: `if (Get-Command foo -ErrorAction SilentlyContinue) { ... }`
+  - Bash: `if command -v foo &> /dev/null; then ... fi`
+
+- **No unquoted variables in paths**: Always quote to handle spaces:
+  - Bad: `cd $myPath` or `Set-Location $myPath`
+  - Good: `cd "$myPath"` or `Set-Location "$myPath"`
+
+- **No silent failures**: Check exit codes and provide clear error messages:
+  - Bash: Use `set -e` or explicitly check `$?`
+  - PowerShell: Use `-ErrorAction Stop` or check `$LASTEXITCODE`
+
+- **No platform assumptions**: Don't assume line endings, path separators, or command availability across platforms
+
 ### When Creating New Scripts
 1. Determine the target platform
 2. Place in the correct platform directory (`windows/`, `linux/`, or `mac/`)
