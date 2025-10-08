@@ -1,0 +1,38 @@
+# Logs
+*.log
+install-tools-log.txt
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Backup files
+*.bak
+*.backup
+*.swp
+*.swo
+
+# OS specific
+# Windows
+Thumbs.db
+desktop.ini
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+# Linux
+*~
+
+# Editor specific
+.vscode/
+.idea/
+*.sublime-*
+
+# PowerShell specific
+*.ps1.bak
+
+# Personal/sensitive files
+*_local.*
+*_private.*
+credentials.*
