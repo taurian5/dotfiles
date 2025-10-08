@@ -6,11 +6,20 @@ Personal development scripts and configuration files for multiple platforms.
 
 ```
 dotfiles/
-├── windows/          # Windows-specific scripts
-├── mac/              # macOS-specific scripts
-├── linux/            # Linux-specific scripts
+├── .claude/          # Claude Code configuration
+│   └── settings.local.json  # Auto-allow permissions for Claude
+├── windows/          # Windows-specific scripts (.ps1)
+├── mac/              # macOS-specific scripts (.sh)
+├── linux/            # Linux-specific scripts (.sh)
 └── shared/           # Cross-platform configuration files
 ```
+
+### Script Organization Guidelines
+- **Windows scripts**: Place PowerShell scripts (`.ps1`) in `windows/`
+- **Linux scripts**: Place bash scripts (`.sh`) in `linux/`
+- **macOS scripts**: Place bash scripts (`.sh`) in `mac/`
+- **Cross-platform configs**: Place dotfiles (`.gitconfig`, `.vimrc`, etc.) in `shared/`
+- **Claude config**: Place Claude Code settings in `.claude/`
 
 ## Windows Scripts
 
@@ -46,15 +55,55 @@ Configure Git with user settings and recommended defaults.
 .\configure-git.ps1 -Name "Your Name" -Email "your.email@example.com"
 ```
 
+### [check-claude-settings.ps1](windows/check-claude-settings.ps1)
+Checks if global Claude settings (`~/.claude/settings.json`) match the repo's local settings.
+
+**Usage:**
+```powershell
+.\check-claude-settings.ps1
+```
+
 ## macOS Scripts
 
 ### [setup.sh](mac/setup.sh)
 macOS development environment setup (TODO: customize for your needs)
 
+### [check-claude-settings.sh](mac/check-claude-settings.sh)
+Checks if global Claude settings (`~/.claude/settings.json`) match the repo's local settings.
+
+**Usage:**
+```bash
+./check-claude-settings.sh
+```
+
 ## Linux Scripts
 
 ### [setup.sh](linux/setup.sh)
 Linux development environment setup (TODO: customize for your needs)
+
+### [check-claude-settings.sh](linux/check-claude-settings.sh)
+Checks if global Claude settings (`~/.claude/settings.json`) match the repo's local settings.
+
+**Usage:**
+```bash
+./check-claude-settings.sh
+```
+
+## Claude Code Configuration
+
+### [.claude/settings.local.json](.claude/settings.local.json)
+Project-specific Claude Code permissions and settings. Defines auto-allow rules for commands like git, npm, and file operations.
+
+**To sync to global settings:**
+```bash
+# Windows
+Copy-Item .claude\settings.local.json $env:USERPROFILE\.claude\settings.json
+
+# Linux/Mac
+cp .claude/settings.local.json ~/.claude/settings.json
+```
+
+Use the platform-specific `check-claude-settings` script to verify sync status.
 
 ## Shared Configuration
 
