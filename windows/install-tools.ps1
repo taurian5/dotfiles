@@ -163,6 +163,109 @@ Write-Log ""
 if ($gitOk -and $ghOk -and $claudeOk) {
     Write-Log "SUCCESS! All tools installed." "Green"
     Write-Log ""
+
+    # Check for updates
+    Write-Log "Checking for updates..." "Yellow"
+    $updatesAvailable = $false
+
+    # Check Git updates
+    if (Test-Command "winget") {
+        try {
+            $gitUpdate = winget upgrade --id Git.Git 2>&1 | Out-String
+            if ($gitUpdate -notmatch "No applicable update found") {
+                Write-Log "[ ] Git update available" "Yellow"
+                $updatesAvailable = $true
+            } else {
+                Write-Log "[X] Git is up to date" "Green"
+            }
+        } catch {
+            Write-Log "Could not check Git updates" "Gray"
+        }
+
+        # Check GitHub CLI updates
+        try {
+            $ghUpdate = winget upgrade --id GitHub.cli 2>&1 | Out-String
+            if ($ghUpdate -notmatch "No applicable update found") {
+                Write-Log "[ ] GitHub CLI update available" "Yellow"
+                $updatesAvailable = $true
+            } else {
+                Write-Log "[X] GitHub CLI is up to date" "Green"
+            }
+        } catch {
+            Write-Log "Could not check GitHub CLI updates" "Gray"
+        }
+    }
+
+    # Check Claude Code updates (via npm)
+    if (Test-Command "npm") {
+        try {
+            $claudeOutdated = npm outdated -g @anthropic-ai/claude-code 2>&1 | Out-String
+            if ($claudeOutdated -match "@anthropic-ai/claude-code") {
+                Write-Log "[ ] Claude Code update available" "Yellow"
+                $updatesAvailable = $true
+            } else {
+                Write-Log "[X] Claude Code is up to date" "Green"
+            }
+        } catch {
+            Write-Log "Could not check Claude Code updates" "Gray"
+        }
+    }
+
+    Write-Log ""
+
+    # Prompt to update if updates are available
+    if ($updatesAvailable) {
+        Write-Log "Updates are available!" "Yellow"
+        Write-Log ""
+        $response = Read-Host "Would you like to update now? (y/n)"
+
+        if ($response -eq "y" -or $response -eq "Y") {
+            Write-Log ""
+            Write-Log "Updating tools..." "Cyan"
+            Write-Log ""
+
+            # Update Git
+            try {
+                Write-Log "Updating Git..." "Yellow"
+                winget upgrade --id Git.Git --silent
+                Write-Log "Git updated" "Green"
+            } catch {
+                Write-Log "Git update failed" "Red"
+            }
+
+            # Update GitHub CLI
+            try {
+                Write-Log "Updating GitHub CLI..." "Yellow"
+                winget upgrade --id GitHub.cli --silent
+                Write-Log "GitHub CLI updated" "Green"
+            } catch {
+                Write-Log "GitHub CLI update failed" "Red"
+            }
+
+            # Update Claude Code
+            if (Test-Command "npm") {
+                try {
+                    Write-Log "Updating Claude Code..." "Yellow"
+                    npm install -g @anthropic-ai/claude-code@latest
+                    Write-Log "Claude Code updated" "Green"
+                } catch {
+                    Write-Log "Claude Code update failed" "Red"
+                }
+            }
+
+            Write-Log ""
+            Write-Log "Updates complete!" "Green"
+        } else {
+            Write-Log "Skipping updates." "Gray"
+            Write-Log ""
+            Write-Log "To update manually later, run:" "Cyan"
+            Write-Log "  winget upgrade --id Git.Git" "Gray"
+            Write-Log "  winget upgrade --id GitHub.cli" "Gray"
+            Write-Log "  npm install -g @anthropic-ai/claude-code@latest" "Gray"
+        }
+    }
+
+    Write-Log ""
     Write-Log "Next steps:" "Cyan"
     Write-Log "1. Close this window" "White"
     Write-Log "2. Open a NEW PowerShell" "White"
